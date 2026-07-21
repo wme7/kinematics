@@ -14,7 +14,7 @@ $$
 m\,\ddot{u} + b\,\dot{u} + k\,u = F(t).
 $$
 
-![Vehicle damper on a bumpy road](bumpy_road/bumpy_road.gif)
+![Vehicle damper on a bumpy road](./bumpy_road/bumpy_road.gif)
 
 Explore the full folder: **[bumpy_road/](bumpy_road/)** · guide: **[bumpy_road/README.md](bumpy_road/README.md)**
 
@@ -22,7 +22,7 @@ Explore the full folder: **[bumpy_road/](bumpy_road/)** · guide: **[bumpy_road/
 
 A two-wheeled robot follows a planned path in the plane. Controllers (PID, and optionally MPC) choose forward speed \(v\) and yaw rate \(\omega\) from the pose \((x, y, \theta)\).
 
-![Robot path tracking](robot_turtle/path6.gif)
+![Robot path tracking](./robot_turtle/path6.gif)
 
 Explore the full folder: **[robot_turtle/](robot_turtle/)** · guide: **[robot_turtle/README.md](robot_turtle/README.md)**
 
