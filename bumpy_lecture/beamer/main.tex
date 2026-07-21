@@ -1,0 +1,145 @@
+% \documentclass[handout,aspectratio=169,11pt]{beamer}
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{cancel}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+\usepackage{verbatim}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+\pgfplotsset{compat=1.18}
+\usepackage{subcaption}
+\usetikzlibrary{decorations.pathreplacing, positioning}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{references.bib}
+
+\usetheme{Warsaw}
+\usecolortheme{wolverine}
+\usefonttheme{serif}
+\useinnertheme{circles}
+\useoutertheme{shadow}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  filecolor=cyan,
+  citecolor=gray,
+  urlcolor=magenta,
+  pdftitle={Vehicle Vibrations on a Bumpy Road},
+}
+
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{note page}[plain]
+\setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+\setbeamertemplate{headline}{}
+
+\lstdefinestyle{pythoncompact}{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black}\itshape,
+  stringstyle=\color{red!70!black},
+  showstringspaces=false,
+  breaklines=true,
+  tabsize=2,
+  columns=fullflexible,
+}
+
+\lstdefinestyle{pythonTiny}{
+  language=Python,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black}\itshape,
+  stringstyle=\color{red!70!black},
+  showstringspaces=false,
+  breaklines=true,
+  tabsize=2,
+  columns=fullflexible,
+}
+
+\lstdefinestyle{terminal}{
+  basicstyle=\ttfamily\footnotesize,
+  showstringspaces=false,
+  breaklines=true,
+  columns=fullflexible,
+}
+
+
+\title{Vehicle Vibrations on a Bumpy Road}
+\subtitle{Constructing and running the \texttt{bumpy\_road} example}
+\author{Manuel A. Diaz}
+\institute{InspiraSTEM Internship}
+\date{\today}
+\titlegraphic{\includegraphics[height=1.35cm]{figures/InspiraSTEM_logo.png}}
+
+\AtBeginSection[]{
+  \begin{frame}{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+\begin{frame}{This worked example}
+  \begin{itemize}
+    \item generates (or loads) road-height profiles as CSV data,
+    \item applies those profiles as forcing for a mass--spring--damper ODE,
+    \item solves the ODE with a centered finite-difference method,
+    \item visualizes displacements, spectra, and an animation of the ride.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Skills illustrated}
+  \begin{itemize}
+    \item NumPy arrays, finite differences, and ODE time stepping
+    \item reading/writing CSV and pickling results
+    \item command-line options with \texttt{argparse}
+    \item Matplotlib plotting and FFT spectra
+    \item SymPy manufactured solutions and \texttt{pytest}
+    \item packaging the workflow with \texttt{uv run}
+  \end{itemize}
+  \vspace{0.8em}
+  Sources live in \texttt{bumpy\_road/} at
+  \url{https://github.com/wme7/kinematics}.
+\end{frame}
+
+\begin{frame}[fragile]{Suggested student workflow}
+\begin{lstlisting}[style=terminal]
+cd bumpy_road
+uv run python generate_road_profiles.py   # -> bumpy.csv
+uv run python plot_roads.py               # -> road_profiles.png
+uv run python bumpy.py                    # -> bumpy.res
+uv run python explore.py 180              # plots / spectra
+uv run python bumpy_road_anim.py          # GIF / MP4
+\end{lstlisting}
+\end{frame}
+
+\input{sections/01_model}
+\input{sections/02_numerics}
+\input{sections/03_roads_and_force}
+\input{sections/04_pipeline}
+\input{sections/05_explore}
+\input{sections/06_verification}
+
+%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,275 @@
+\section{Functions and branching}
+
+\begin{frame}[fragile]{Functions}
+  \begin{itemize}
+    \item $s(t)=v_0t + \frac{1}{2}at^2$ is a mathematical function
+    \item Can implement $s(t)$ as a Python function \texttt{s(t)}
+  \end{itemize}
+\begin{lstlisting}[style=pythoncompact]
+def s(t):
+    return v0*t + 0.5*a*t**2
+
+v0 = 0.2
+a = 4
+value = s(3)   # Call the function
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Function notes}
+  \begin{itemize}
+    \item functions start with the keyword \texttt{def}
+    \item statements belonging to the function must be indented
+    \item function input is represented by arguments
+          (comma-separated if more than one)
+    \item function output is returned to the calling code
+    \item \texttt{v0} and \texttt{a} above are \emph{global variables},
+          which must be initialized before \texttt{s(t)} is called
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Functions can have multiple arguments}
+  \texttt{v0} and \texttt{a} as function arguments instead of globals:
+\begin{lstlisting}[style=pythoncompact]
+def s(t, v0, a):
+    return v0*t + 0.5*a*t**2
+
+value = s(3, 0.2, 4)   # Call the function
+
+# More readable call
+value = s(t=3, v0=0.2, a=4)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Keyword arguments (default values)}
+\begin{lstlisting}[style=pythoncompact]
+def s(t, v0=1, a=1):
+    return v0*t + 0.5*a*t**2
+
+value = s(3, 0.2, 4)         # specify new v0 and a
+value = s(3)                 # rely on v0=1 and a=1
+value = s(3, a=2)            # rely on v0=1
+value = s(3, v0=2)           # rely on a=1
+value = s(t=3, v0=2, a=2)    # specify everything
+value = s(a=2, t=3, v0=2)    # any keyword order
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Positional vs keyword arguments}
+  \begin{itemize}
+    \item Arguments without the argument name are \emph{positional}
+    \item Positional arguments must always be listed before keyword
+          arguments in the definition and in any call
+    \item The sequence of keyword arguments can be arbitrary
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Vectorization speeds up the code}
+  Scalar code (one number at a time):
+\begin{lstlisting}[style=pythoncompact]
+def s(t, v0, a):
+    return v0*t + 0.5*a*t**2
+
+for i in range(len(t_values)):
+    s_values[i] = s(t_values[i], v0, a)
+\end{lstlisting}
+  Vectorized code: apply \texttt{s} to the entire array
+\begin{lstlisting}[style=pythoncompact]
+s_values = s(t_values, v0, a)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{How can vectorization work?}
+  Expression \texttt{v0*t + 0.5*a*t**2} with array \texttt{t}:
+  \begin{itemize}
+    \item \texttt{r1 = v0*t} (scalar times array)
+    \item \texttt{r2 = t**2} (square each element)
+    \item \texttt{r3 = 0.5*a*r2} (scalar times array)
+    \item \texttt{r1 + r3} (add each element)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Scalar functions often work for arrays too}
+  True if computations involve arithmetic and math functions:
+\begin{lstlisting}[style=pythoncompact]
+from math import exp, sin
+
+def f(x):
+    return 2*x + x**2*exp(-x)*sin(x)
+
+v = f(4)  # works with scalar x
+
+from numpy import exp, sin, linspace
+x = linspace(0, 4, 100001)
+v = f(x)  # now works with array x
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Functions can return multiple values}
+  Return $s(t)=v_0t+\frac{1}{2}at^2$ and $s'(t)=v_0 + at$:
+\begin{lstlisting}[style=pythoncompact]
+def movement(t, v0, a):
+    s = v0*t + 0.5*a*t**2
+    v = v0 + a*t
+    return s, v
+
+s_value, v_value = movement(t=0.2, v0=2, a=4)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Multiple return values are a tuple}
+  \texttt{return s, v} returns a \emph{tuple} ($\approx$ immutable list):
+\begin{lstlisting}[style=pythonTiny]
+>>> def f(x):
+...     return x+1, x+2, x+3
+...
+>>> r = f(3)
+>>> print(r)
+(4, 5, 6)
+>>> type(r)
+<class 'tuple'>
+>>> print(r[1])
+5
+\end{lstlisting}
+  Tuples are constant lists (cannot be changed).
+\end{frame}
+
+\begin{frame}{A more general formula (part I)}
+  Equations from basic kinematics:
+  \begin{align*}
+    v = \frac{ds}{dt},\quad s(0)=s_0\\
+    a = \frac{dv}{dt},\quad v(0)=v_0
+  \end{align*}
+  Integrate to find $v(t)$:
+  \[
+    \int_0^t a(t)\,dt = \int_0^t \frac{dv}{dt}\,dt
+  \]
+  which gives
+  \[
+    v(t) = v_0 + \int_0^t a(t)\,dt
+  \]
+\end{frame}
+
+\begin{frame}{A more general formula (part II)}
+  Integrate again over $[0,t]$ to find $s(t)$:
+  \[
+    s(t) = s_0 + v_0 t + \int_0^t\left( \int_0^\tau a(\xi)\,d\xi \right) d\tau
+  \]
+  Example: $a(t)=a_0$ for $t\in[0,t_1]$, then $a(t)=0$ for $t>t_1$:
+  \[
+  s(t) =
+  \begin{cases}
+  s_0 + v_0 t + \tfrac12 a_0 t^2, & t\leq t_1\\[0.5em]
+  s_0 + v_0 t_1 + \tfrac12 a_0 t_1^2 + a_0 t_1(t-t_1), & t> t_1
+  \end{cases}
+  \]
+  Need an \emph{if} test to implement this!
+\end{frame}
+
+\begin{frame}[fragile]{Basic if-else tests}
+\begin{lstlisting}[style=pythoncompact]
+if condition:
+    <statements when condition is True>
+else:
+    <statements when condition is False>
+\end{lstlisting}
+  Here, \texttt{condition} is a boolean expression with value
+  \texttt{True} or \texttt{False}.
+\begin{lstlisting}[style=pythoncompact]
+if t <= t1:
+    s = v0*t + 0.5*a0*t**2
+else:
+    s = v0*t + 0.5*a0*t1**2 + a0*t1*(t-t1)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Multi-branch if tests}
+\begin{lstlisting}[style=pythonTiny]
+if condition1:
+    <statements when condition1 is True>
+elif condition2:
+    <when condition1 is False and condition2 is True>
+elif condition3:
+    <when 1 and 2 are False and condition3 is True>
+else:
+    <when condition1/2/3 all are False>
+\end{lstlisting}
+  Just if, no else:
+\begin{lstlisting}[style=pythoncompact]
+if condition:
+    <statements when condition is True>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Piecewise function with if}
+\begin{lstlisting}[style=pythonTiny]
+def s_func(t, v0, a0, t1):
+    if t <= t1:
+        s = v0 * t + 0.5 * a0 * t**2
+    else:
+        s = (v0 * t + 0.5 * a0 * t1**2
+             + a0 * t1 * (t - t1))
+    return s
+\end{lstlisting}
+  Full demo: \texttt{python\_intro/plot3.py}
+\end{frame}
+
+\begin{frame}[fragile]{If + arrays: does not work}
+\begin{lstlisting}[style=pythonTiny]
+>>> def f(x):
+...     return x if x < 1 else 2*x
+...
+>>> import numpy as np
+>>> x = np.linspace(0, 2, 5)
+>>> f(x)
+ValueError: The truth value of an array with more than one
+element is ambiguous. Use a.any() or a.all()
+\end{lstlisting}
+  Problem: \texttt{x < 1} evaluates to a boolean array, not a single boolean.
+\end{frame}
+
+\begin{frame}[fragile]{Remedy 1: call with scalar arguments}
+\begin{lstlisting}[style=pythonTiny]
+n = 201
+t1 = 1.5
+v0 = 0.2
+a0 = 20
+t = np.linspace(0, 2, n + 1)
+s = np.zeros(n + 1)
+for i in range(len(t)):
+    s[i] = s_func(t=t[i], v0=v0, a0=a0, t1=t1)
+
+plt.plot(t, s, 'b-')
+plt.plot([t1, t1], [0, s_func(t=t1, v0=v0, a0=a0, t1=t1)], 'r--')
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Remedy 2: vectorize with \texttt{where}}
+\begin{lstlisting}[style=pythoncompact]
+s = np.where(condition, s1, s2)
+\end{lstlisting}
+  \begin{itemize}
+    \item \texttt{condition}: array of boolean values
+    \item \texttt{s[i] = s1[i]} if \texttt{condition[i]} is \texttt{True}
+    \item \texttt{s[i] = s2[i]} if \texttt{condition[i]} is \texttt{False}
+  \end{itemize}
+\begin{lstlisting}[style=pythonTiny]
+s = np.where(t <= t1,
+             v0*t + 0.5*a0*t**2,
+             v0*t + 0.5*a0*t1**2 + a0*t1*(t-t1))
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Remedy 3: vectorize with array indexing}
+  \begin{itemize}
+    \item Let \texttt{b} be a boolean array (e.g.\ \texttt{b = t <= t1})
+    \item \texttt{s[b]} selects elements where \texttt{b[i]} is \texttt{True}
+    \item Assign: \texttt{s[b] = (expr)[b]}
+  \end{itemize}
+\begin{lstlisting}[style=pythonTiny]
+s = np.zeros_like(t)
+s[t <= t1] = (v0*t + 0.5*a0*t**2)[t <= t1]
+s[t > t1]  = (v0*t + 0.5*a0*t1**2
+              + a0*t1*(t-t1))[t > t1]
+\end{lstlisting}
+  See also \texttt{python\_intro/plot3\_vec.py}.
+\end{frame}

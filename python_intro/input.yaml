@@ -1,0 +1,5 @@
+# Input parameters for for_file_read_input.py
+v0: 2.0
+a: 0.2
+dt: 0.1
+interval: [0, 2]

@@ -1,0 +1,78 @@
+\section{Numerical method}
+
+\begin{frame}{Finite-difference idea}
+  \begin{itemize}
+    \item Centered differences in time
+    \item $u^n$: approximation to $u(t_n)$, $t_n = n\Delta t$
+    \item First: linear damping $f(u') = b u'$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Update formula (linear damping)}
+  \[
+  u^{n+1} =
+  \frac{
+    2m u^n + \bigl(\tfrac{b}{2}\Delta t - m\bigr) u^{n-1}
+    + \Delta t^2\bigl(F^n - s(u^n)\bigr)
+  }{
+    m + \tfrac{b}{2}\Delta t
+  }
+  \]
+  Special starter step for $n=0$:
+  \[
+  u^1 = u^0 + \Delta t\, V
+  + \frac{\Delta t^2}{2m}\bigl(-b V - s(u^0) + F^0\bigr).
+  \]
+\end{frame}
+
+\begin{frame}{Quadratic damping}
+  For $f(u') = b|u'|u'$, linearize with a geometric mean:
+  \[
+  |u'|u'\Big|^{n}
+  \approx |u'|^{n-\frac12}\,(u')^{n+\frac12}.
+  \]
+  Resulting update (sketch):
+  \[
+  u^{n+1}
+  = \frac{
+    2m u^n - m u^{n-1}
+    + b u^n |u^n - u^{n-1}|
+    + \Delta t^2\bigl(F^n - s(u^n)\bigr)
+  }{
+    m + b\,|u^n - u^{n-1}|
+  }.
+  \]
+  Implemented in \texttt{solver.py} via
+  \texttt{damping='quadratic'}.
+\end{frame}
+
+\begin{frame}[fragile]{Simple linear solver}
+  Teaching version: \texttt{solver\_linear\_damping}
+  \lstinputlisting[style=pythonTiny]{code/solver_linear.py}
+\end{frame}
+
+\begin{frame}[fragile]{Using the linear solver}
+  \lstinputlisting[style=pythoncompact]{code/session_linear.py}
+  Free vibration: $F\equiv 0$, linear spring $s(u)=2u$.
+\end{frame}
+
+\begin{frame}[fragile]{Full solver (API)}
+  Improvements over the teaching version:
+  \begin{itemize}
+    \item linear \emph{and} quadratic damping
+    \item $F$ may be a function or a measured array
+    \item docstrings; raise exceptions on bad input
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Full solver (setup and $u^1$)}
+  \lstinputlisting[style=pythonTiny]{code/solver_full_part1.py}
+\end{frame}
+
+\begin{frame}[fragile]{Full solver (time stepping)}
+  \lstinputlisting[style=pythonTiny]{code/solver_full_part2.py}
+\end{frame}
+
+\begin{frame}[fragile]{Nonlinear spring + quadratic damping}
+  \lstinputlisting[style=pythonTiny]{code/session_quadratic.py}
+\end{frame}

@@ -1,0 +1,146 @@
+\section{Files}
+
+\begin{frame}[fragile]{File reading}
+  Put input data in a text / YAML file (modern approach in this repo):
+\begin{lstlisting}[style=terminal]
+# input.yaml
+v0: 2.0
+a: 0.2
+dt: 0.1
+interval: [0, 2]
+\end{lstlisting}
+  \begin{alertblock}{Question}
+    How can we read this file into variables \texttt{v0}, \texttt{a},
+    \texttt{dt}, and \texttt{interval}?
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Reading parameters with YAML}
+\lstinputlisting[style=pythonTiny,firstline=7,lastline=26]{code/for_file_read_input.py}
+\end{frame}
+
+\begin{frame}[fragile]{Classic line parsing: \texttt{variable = value}}
+  Older style (still useful to understand):
+\begin{lstlisting}[style=pythonTiny]
+with open('input.dat') as infile:
+    for line in infile:
+        name, value = line.split('=')
+        name = name.strip()
+        if name in ('v0', 'a', 'dt'):
+            exec(f'{name} = float({value})')
+        elif name == 'interval':
+            interval = eval(value)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Splitting lines into words}
+\begin{lstlisting}[style=pythonTiny]
+>>> line = 'v0 = 5.3'
+>>> variable, value = line.split('=')
+>>> variable
+'v0 '
+>>> value
+' 5.3'
+>>> variable.strip()  # strip away blanks
+'v0'
+\end{lstlisting}
+  Note: must convert \texttt{value} to \texttt{float} before computing!
+\end{frame}
+
+\begin{frame}[fragile]{The magic \texttt{eval} function}
+  \texttt{eval(s)} executes a string \texttt{s} as a Python expression
+  and creates the corresponding object:
+\begin{lstlisting}[style=pythonTiny]
+>>> obj1 = eval('1+2')
+>>> obj1, type(obj1)
+(3, <class 'int'>)
+>>> obj2 = eval('[-1, 8, 10, 11]')
+>>> obj2, type(obj2)
+([-1, 8, 10, 11], <class 'list'>)
+>>> from math import sin, pi
+>>> x = 1
+>>> obj3 = eval('sin(pi*x)')
+>>> obj3, type(obj3)
+(1.2246467991473532e-16, <class 'float'>)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Why is \texttt{eval} useful?}
+  We can read formulas, lists, expressions as text from a file and with
+  \texttt{eval} turn them into live Python objects.
+
+  \begin{alertblock}{Caution}
+    Only use \texttt{eval} on trusted input (never on arbitrary user
+    strings from the web).
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Implementing a calculator in Python}
+  Demo:
+\begin{lstlisting}[style=terminal]
+Terminal> uv run python calc.py "1 + 0.5*2"
+2.0
+Terminal> uv run python calc.py "sin(pi*2.5) + exp(-4)"
+1.0183156388887342
+\end{lstlisting}
+  Just a few lines:
+\begin{lstlisting}[style=pythoncompact]
+import sys
+from math import *   # sin, cos, exp, pi, etc.
+expression = sys.argv[1]
+result = eval(expression)
+print(result)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{The \texttt{with} statement for file handling}
+\begin{lstlisting}[style=pythoncompact]
+with open('input.dat', 'r') as infile:
+    for line in infile:
+        ...
+\end{lstlisting}
+  No need to close the file when using \texttt{with}.
+\end{frame}
+
+\begin{frame}[fragile]{File writing}
+  \begin{itemize}
+    \item We have $t$ and $s(t)$ in lists \texttt{t\_values}, \texttt{s\_values}
+    \item Task: write a nicely formatted table to a file
+  \end{itemize}
+\begin{lstlisting}[style=pythonTiny]
+with open('table1.dat', 'w') as outfile:
+    outfile.write('# t    s(t)\n')
+    for t, s in zip(t_values, s_values):
+        outfile.write(f'{t:.2f}  {s:.4f}\n')
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Simplified writing: \texttt{numpy.savetxt}}
+\begin{lstlisting}[style=pythonTiny]
+data = np.array([t_values, s_values]).transpose()
+np.savetxt('table2.dat', data, fmt=['%.2f', '%.4f'],
+           header='t   s(t)', comments='# ')
+\end{lstlisting}
+  Resulting \texttt{table2.dat}:
+\begin{lstlisting}[style=terminal]
+# t   s(t)
+0.00 0.0000
+0.10 0.2010
+0.20 0.4040
+...
+2.00 4.4000
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Simplified reading: \texttt{numpy.loadtxt}}
+\begin{lstlisting}[style=pythoncompact]
+data = np.loadtxt('table2.dat', comments='#')
+\end{lstlisting}
+  Note:
+  \begin{itemize}
+    \item Lines beginning with \texttt{\#} are skipped
+    \item \texttt{data} is a 2-D array: \texttt{data[i,0]} holds $t$
+          and \texttt{data[i,1]} holds $s(t)$ in row $i$
+  \end{itemize}
+  Full script: \texttt{python\_intro/for\_file\_read\_input.py}
+\end{frame}

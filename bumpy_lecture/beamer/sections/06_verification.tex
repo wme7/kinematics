@@ -1,0 +1,63 @@
+\section{Verification and symbolic tools}
+
+\begin{frame}{Why verify?}
+  \begin{itemize}
+    \item Finite-difference bugs are easy to introduce
+    \item A \emph{manufactured solution}: pick a simple exact $u(t)$,
+          compute the forcing $F(t)$ that makes the ODE hold,
+          then check that the numerical solver recovers $u$
+    \item SymPy builds $F$; \texttt{pytest} asserts the error is tiny
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{SymPy sketch of the ODE}
+  \lstinputlisting[style=pythoncompact]{code/sympy_demo.py}
+  (Modernized Python~3 style; see also \texttt{symbolic.py}
+  and \texttt{tests/test\_bumpy.py}.)
+\end{frame}
+
+\begin{frame}{Manufactured solution idea}
+  Choose e.g.\ $u(t) = I + Vt + qt^2$ (linear damping).
+  \begin{enumerate}
+    \item Form LHS $= m u'' + b u' + s(u)$ symbolically
+    \item Set $F(t) =$ LHS evaluated on that $u$
+    \item Call \texttt{solver(..., F, ...)}
+    \item Compare numerical $u^n$ to the exact $u(t_n)$
+  \end{enumerate}
+  For quadratic damping, a linear exact solution
+  $u = I + Vt$ is convenient.
+\end{frame}
+
+\begin{frame}[fragile]{Test function (excerpt)}
+  \lstinputlisting[style=pythonTiny]{code/test_solver.py}
+\end{frame}
+
+\begin{frame}[fragile]{Running the tests}
+\begin{lstlisting}[style=terminal]
+# from the repository root (pyproject.toml)
+uv run pytest bumpy_road/tests/test_bumpy.py -q
+\end{lstlisting}
+  Also covers scalar vs vectorized \texttt{acceleration}.
+\end{frame}
+
+\begin{frame}{Optional extras}
+  \begin{itemize}
+    \item \texttt{--cython} flag in \texttt{bumpy.py}: optional
+          compiled solver (not required for the first run)
+    \item \texttt{timings.py}: longer runs / performance checks
+    \item \texttt{./clean.sh}: remove generated
+          \texttt{bumpy.csv}, \texttt{bumpy.res}, plots
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Takeaways}
+  \begin{itemize}
+    \item Road curvature + speed $\to$ forcing of a
+          mass--spring--damper ODE
+    \item Centered FD time stepping in \texttt{solver.py}
+    \item CSV roads, \texttt{uv} workflow, pickle + explore + FFT
+    \item Manufactured solutions + \texttt{pytest} for confidence
+  \end{itemize}
+  \vspace{0.8em}
+  Folder: \texttt{bumpy\_road/} in the kinematics repository.
+\end{frame}

@@ -1,0 +1,119 @@
+\section{Classes}
+
+\begin{frame}{Why classes?}
+  \begin{block}{}
+    \begin{itemize}
+      \item All objects in Python are made from a class
+      \item You do not need to know about classes to use Python
+      \item But class programming is powerful
+    \end{itemize}
+  \end{block}
+  \begin{block}{}
+    \begin{itemize}
+      \item Class $=$ functions $+$ variables packed together
+      \item A class is a logical unit in a program
+      \item A large program as a combination of appropriate units
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{A very simple class}
+  \begin{itemize}
+    \item One variable: \texttt{a}
+    \item One function: \texttt{dump} for printing \texttt{a}
+  \end{itemize}
+\begin{lstlisting}[style=pythoncompact]
+class Trivial:
+    def __init__(self, a):
+        self.a = a
+
+    def dump(self):
+        print(self.a)
+\end{lstlisting}
+  Terminology: functions are called \emph{methods} and variables are
+  called \emph{attributes}.
+\end{frame}
+
+\begin{frame}[fragile]{How can we use this class?}
+  First, make an \emph{instance} (object) of the class:
+\begin{lstlisting}[style=pythoncompact]
+t = Trivial(a=4)
+t.dump()
+\end{lstlisting}
+  Note:
+  \begin{itemize}
+    \item \texttt{Trivial(a=4)} means \texttt{Trivial.\_\_init\_\_(t, 4)}
+    \item \texttt{self} is an argument in \texttt{\_\_init\_\_} and
+          \texttt{dump}, but not used in the calls
+    \item \texttt{\_\_init\_\_} is the \emph{constructor}
+    \item \texttt{t.dump()} means \texttt{Trivial.dump(t)}
+          (\texttt{self} is \texttt{t})
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The \texttt{self} argument}
+  It takes time and experience to understand \texttt{self}!
+  \begin{enumerate}
+    \item \texttt{self} must always be the first argument
+    \item \texttt{self} is never used in calls
+    \item \texttt{self} is used to access attributes and methods
+          inside methods
+  \end{enumerate}
+  \begin{block}{}
+    \texttt{self} is confusing at first, but later it greatly helps
+    understanding how classes work!
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{A class for a mathematical function}
+  Function with one independent variable $t$ and parameters $v_0$, $a$:
+  \[
+    s(t; v_0, a) = v_0 t + \frac{1}{2} a t^2
+  \]
+  Class representation:
+  \begin{itemize}
+    \item \texttt{v0} and \texttt{a} are attributes (data)
+    \item A method to evaluate $s(t)$ as a function of \texttt{t} only
+  \end{itemize}
+  Usage:
+\begin{lstlisting}[style=pythoncompact]
+s = Distance(v0=2, a=0.5)  # create instance
+v = s(t=0.2)               # compute formula
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{The class code}
+\begin{lstlisting}[style=pythoncompact]
+class Distance:
+    def __init__(self, v0, a):
+        self.v0 = v0
+        self.a = a
+
+    def __call__(self, t):
+        v0, a = self.v0, self.a
+        return v0*t + 0.5*a*t**2
+
+s = Distance(v0=2, a=0.5)
+v = s(t=0.2)   # actually s.__call__(t=0.2)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{General $f(x,y,z; p_1,\ldots,p_n)$}
+  \begin{itemize}
+    \item The $n$ parameters $p_1,\ldots,p_n$ are attributes
+    \item \texttt{\_\_call\_\_(self, x, y, z)} computes $f(x,y,z)$
+  \end{itemize}
+\begin{lstlisting}[style=pythonTiny]
+class F:
+    def __init__(self, p1, p2, ...):
+        self.p1 = p1
+        self.p2 = p2
+        ...
+
+    def __call__(self, x, y, z):
+        # return formula with x, y, z and self.p1, ...
+
+f = F(p1=..., p2=..., ...)
+print(f(1, 4, -1))
+\end{lstlisting}
+\end{frame}

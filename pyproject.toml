@@ -1,0 +1,22 @@
+[project]
+name = "kinematics"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "imageio>=2.37.2",
+    "imageio-ffmpeg>=0.6.0",
+    "matplotlib>=3.11.1",
+    "numpy>=2.5.1",
+    "pillow>=12.1.0",
+    "pygame>=2.6.1",
+    "pytest>=9.1.1",
+    "pyyaml>=6.0.3",
+    "scipy>=1.18.0",
+    "sympy>=1.14.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["bumpy_road"]
+testpaths = ["bumpy_road/tests"]

@@ -1,0 +1,45 @@
+\section{Pipeline and command line}
+
+\begin{frame}{High-level function \texttt{bumpy\_road}}
+  \begin{enumerate}
+    \item Resolve \texttt{roadfile}: local CSV path or URL
+          (\texttt{urllib.request} download if needed)
+    \item \texttt{load\_road\_csv} $\to$ $x$, $h$-profiles
+    \item Set $t = x/v$; optional stability check on $\Delta t$
+    \item For each profile: $a=h''v^2$, $F=-ma$, call \texttt{solver}
+    \item Return \texttt{data = [x, t, [h,F,u], \ldots]}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Noise level: RMS displacement}
+  \[
+  u_{\mathrm{rms}}
+  = \sqrt{T^{-1}\int_0^T u^2\,dt}
+  \approx
+  \sqrt{\frac{1}{N+1}\sum_{n=0}^{N} (u^n)^2}.
+  \]
+  Compact list comprehension in \texttt{bumpy.py}:
+\begin{lstlisting}[style=pythoncompact]
+u_rms = [np.sqrt((1.0/len(u))*np.sum(u**2))
+         for h, F, u in data[2:]]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Pickling results}
+  Persist the whole \texttt{data} list for later plotting:
+  \lstinputlisting[style=pythoncompact]{code/pickle_rms.py}
+  Use binary modes \texttt{'wb'}/\texttt{'rb'} (Python~3).
+\end{frame}
+
+\begin{frame}[fragile]{Command-line options}
+  \lstinputlisting[style=pythonTiny]{code/argparse_cli.py}
+\end{frame}
+
+\begin{frame}[fragile]{Running a simulation}
+\begin{lstlisting}[style=terminal]
+uv run python bumpy.py --help
+uv run python bumpy.py --v 8 --b 100
+uv run python bumpy.py --roadfile bumpy.csv
+\end{lstlisting}
+  Prints \texttt{u\_rms} values and writes \texttt{bumpy.res}.
+\end{frame}

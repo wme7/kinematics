@@ -1,0 +1,486 @@
+\section{Variables, loops, lists, and arrays}
+
+\begin{frame}[fragile]{Do you have access to Python?}
+  For this course we use \href{https://docs.astral.sh/uv/}{uv} to install Python and packages.
+
+  \begin{enumerate}
+    \item Install \texttt{uv}
+    \item At the project root (folder with \texttt{pyproject.toml}):
+  \end{enumerate}
+\begin{lstlisting}[style=terminal]
+uv sync
+cd python_intro
+uv run python distance.py
+\end{lstlisting}
+  \texttt{uv run} uses the project environment; no manual \texttt{venv} activation needed.
+\end{frame}
+
+\begin{frame}{Mathematical example}
+  Most examples will involve this formula:
+  \begin{equation}
+    s = v_0 t + \frac{1}{2} a t^2
+  \end{equation}
+  We may view $s$ as a function of $t$: $s(t)$, and also include the
+  parameters in the notation: $s(t;v_0,a)$.
+\end{frame}
+
+\begin{frame}[fragile]{A program for evaluating a formula}
+  \textbf{Task:} Compute $s$ for $t=0.5$, $v_0=2$, and $a=0.2$.
+
+  \textbf{Python code} (\texttt{python\_intro/distance.py}):
+\lstinputlisting[style=pythoncompact,firstline=6]{code/distance.py}
+\end{frame}
+
+\begin{frame}[fragile]{Execution}
+\begin{lstlisting}[style=terminal]
+Terminal> uv run python distance.py
+1.025
+s=1.025
+s        =       1.025
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Assignment statements assign a name to an object}
+\begin{lstlisting}[style=pythoncompact]
+t = 0.5                   # real number makes float object
+v0 = 2                    # integer makes int object
+a = 0.2                   # float object
+s = v0*t + 0.5*a*t**2     # float object
+\end{lstlisting}
+  Rule:
+  \begin{itemize}
+    \item evaluate right-hand side; it results in an \emph{object}
+    \item left-hand side is a name for that object
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Formatted output with text and numbers}
+  \begin{itemize}
+    \item Task: write out text with a number (3 decimals): \texttt{s=1.025}
+    \item Method: f-strings (modern Python)
+  \end{itemize}
+\begin{lstlisting}[style=pythoncompact]
+print(f's={s:g}')       # g: compact notation
+print(f's={s:.2f}')     # f: decimal notation, 2 decimals
+\end{lstlisting}
+  Older alternatives (still valid):
+\begin{lstlisting}[style=pythoncompact]
+print('s=%g' % s)
+print('s={s:.2f}'.format(s=s))
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Programming with a while loop}
+  \begin{itemize}
+    \item Task: write out a table of $t$ and $s(t)$ values (two columns),
+          for $t\in [0,2]$ in steps of $0.1$
+    \item Method: while loop
+  \end{itemize}
+\lstinputlisting[style=pythonTiny,firstline=7]{code/while.py}
+\end{frame}
+
+\begin{frame}[fragile]{Output of the previous program}
+\begin{lstlisting}[style=terminal]
+Terminal> uv run python while.py
+0 0.0
+0.1 0.201
+0.2 0.404
+0.3 0.609
+0.4 0.816
+0.5 1.025
+...
+1.8 3.924
+1.9 4.161
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Structure of a while loop}
+\begin{lstlisting}[style=pythoncompact]
+while condition:
+    <indented statement>
+    <indented statement>
+    <indented statement>
+\end{lstlisting}
+  Note:
+  \begin{itemize}
+    \item the colon in the first line
+    \item all statements in the loop \emph{must be indented}\\
+          (no braces as in C, C++, Java, \ldots)
+    \item \texttt{condition} is a boolean expression (e.g., \texttt{t <= 2})
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Closer look at the output}
+\begin{lstlisting}[style=terminal]
+Terminal> uv run python while.py
+0 0.0
+0.1 0.201
+...
+1.8 3.924
+1.9 4.161
+\end{lstlisting}
+  The last line contains $1.9$, but the while loop should run also when
+  $t=2$ since the test is \texttt{t <= 2}. Why is this test \texttt{False}?
+\end{frame}
+
+\begin{frame}[fragile]{Examine the program (Python Tutor idea)}
+  Step through a smaller loop and examine variables
+  (\href{https://pythontutor.com/visualize.html\#mode=edit}{Python Tutor}):
+\begin{lstlisting}[style=pythoncompact]
+a = 0
+da = 0.4
+while a <= 1.2:
+    print(a)
+    a = a + da
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Round-off errors!}
+  Why is \texttt{a <= 1.2} false when \texttt{a} ``is'' $1.2$?
+\begin{lstlisting}[style=pythoncompact]
+a = 0
+da = 0.4
+while a <= 1.2:
+    print(a)
+    a = a + da
+    print(f'da={da:.16E}\na={a:.16E}')
+    print(f'a <= 1.2: {a <= 1.2}')
+\end{lstlisting}
+  \begin{alertblock}{Key point}
+    Small round-off error in \texttt{da} makes
+    \texttt{a = 1.2000000000000002}
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Never \texttt{a == b} for real numbers}
+  Always use a tolerance!
+\begin{lstlisting}[style=pythoncompact]
+a = 1.2
+b = 0.4 + 0.4 + 0.4
+boolean_condition1 = a == b              # may be False
+
+# This is the way to do it
+tol = 1E-14
+boolean_condition2 = abs(a - b) < tol    # True
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{A list collects several objects in a sequence}
+  A list of numbers:
+\begin{lstlisting}[style=pythoncompact]
+L = [-1, 1, 8.0]
+\end{lstlisting}
+  A list can contain any type of objects:
+\begin{lstlisting}[style=pythoncompact]
+L = ['mydata.txt', 3.14, 10]   # string, float, int
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Basic list operations}
+\begin{lstlisting}[style=pythonTiny]
+>>> L = ['mydata.txt', 3.14, 10]
+>>> print(L[0])    # first element (index 0)
+mydata.txt
+>>> print(L[1])    # second element (index 1)
+3.14
+>>> del L[0]       # delete the first element
+>>> print(L)
+[3.14, 10]
+>>> print(len(L))  # length of L
+2
+>>> L.append(-1)   # add -1 at the end
+>>> print(L)
+[3.14, 10, -1]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Store our table in two lists}
+\lstinputlisting[style=pythonTiny,firstline=7]{code/while_list.py}
+\end{frame}
+
+\begin{frame}[fragile]{For loops}
+  A for loop visits elements in a list, one by one:
+\begin{lstlisting}[style=pythoncompact]
+>>> L = [1, 4, 8, 9]
+>>> for e in L:
+...     print(e)
+...
+1
+4
+8
+9
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{For-loop demo (Python Tutor style)}
+\begin{lstlisting}[style=pythoncompact]
+list1 = [0, 0.1, 0.2]
+list2 = []
+for element in list1:
+    p = element + 2
+    list2.append(p)
+print(list2)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Integer counter over list/array indices}
+\begin{lstlisting}[style=pythoncompact]
+somelist = ['file1.dat', 22, -1.5]
+
+for i in range(len(somelist)):
+    # access list element through index
+    print(somelist[i])
+\end{lstlisting}
+  Note:
+  \begin{itemize}
+    \item \texttt{range} returns a sequence of integers
+    \item \texttt{range(a, b, s)} gives \texttt{a, a+s, \ldots} up to
+          \emph{but not including} $b$
+    \item \texttt{range(b)} implies $a=0$ and $s=1$
+    \item \texttt{range(len(somelist))} gives $0,1,2$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Replace our while loop by a for loop}
+\lstinputlisting[style=pythonTiny,firstline=7]{code/for_list.py}
+\end{frame}
+
+\begin{frame}[fragile]{Traversal of multiple lists with \texttt{zip}}
+\begin{lstlisting}[style=pythoncompact]
+for e1, e2, e3, ... in zip(list1, list2, list3, ...):
+\end{lstlisting}
+  Alternative: loop over a common index
+\begin{lstlisting}[style=pythoncompact]
+for i in range(len(list1)):
+    e1 = list1[i]
+    e2 = list2[i]
+    e3 = list3[i]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Arrays are efficient lists of numbers}
+  \begin{itemize}
+    \item Lists collect objects in a single variable
+    \item Lists are flexible (can grow, can contain ``anything'')
+    \item Array: computationally efficient list of numbers
+    \item Arrays have fixed length and one numeric type
+    \item Arrays require the \texttt{numpy} module
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Examples on using arrays}
+\begin{lstlisting}[style=pythonTiny]
+>>> import numpy
+>>> L = [1, 4, 10.0]    # List of numbers
+>>> a = numpy.array(L)  # Convert to array
+>>> print(a)
+[ 1.  4. 10.]
+>>> print(a[1])         # indexing
+4.0
+>>> print(a[0:2])       # slice (index 2 not included!)
+[1. 4.]
+>>> print(a.dtype)      # data type of an element
+float64
+>>> b = 2*a + 1         # arithmetics on arrays
+>>> print(b)
+[ 3.  9. 21.]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{numpy} functions create entire arrays}
+  Apply $\ln$ to all elements in array \texttt{a}:
+\begin{lstlisting}[style=pythoncompact]
+>>> c = numpy.log(a)
+>>> print(c)
+[0.         1.38629436 2.30258509]
+\end{lstlisting}
+  Create $n+1$ uniformly spaced coordinates in $[a,b]$:
+\begin{lstlisting}[style=pythoncompact]
+t = numpy.linspace(a, b, n+1)
+\end{lstlisting}
+  Array of length $n$ filled with zeros:
+\begin{lstlisting}[style=pythoncompact]
+t = numpy.zeros(n)
+s = numpy.zeros_like(t)  # zeros with t's size and dtype
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Let's use arrays in our previous program}
+\lstinputlisting[style=pythonTiny,firstline=7]{code/for_array.py}
+  Note: no explicit loop for computing \texttt{s\_values}!
+\end{frame}
+
+\begin{frame}[fragile]{Standard math functions: the \texttt{math} module}
+\begin{lstlisting}[style=pythoncompact]
+>>> import math
+>>> print(math.sin(math.pi))
+1.2246467991473532e-16         # approximate value
+\end{lstlisting}
+  Get rid of the \texttt{math} prefix:
+\begin{lstlisting}[style=pythoncompact]
+from math import sin, pi
+print(sin(pi))
+
+from math import *   # import everything
+print(sin(pi), log(e), tanh(0.5))
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Use \texttt{numpy} for math on arrays}
+  Matlab-style:
+\begin{lstlisting}[style=pythoncompact]
+from numpy import *
+x = linspace(0, 1, 101)
+y = exp(-x)*sin(pi*x)
+\end{lstlisting}
+  Preferred style:
+\begin{lstlisting}[style=pythoncompact]
+import numpy as np
+x = np.linspace(0, 1, 101)
+y = np.exp(-x)*np.sin(np.pi*x)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Our convention: \texttt{np} prefix, clean formulas}
+\begin{lstlisting}[style=pythoncompact]
+import numpy as np
+x = np.linspace(0, 1, 101)
+
+from numpy import sin, exp, pi
+y = exp(-x)*sin(pi*x)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Array assignment gives a view (no copy!)}
+  Consider array assignment \texttt{b = a}:
+\begin{lstlisting}[style=pythoncompact]
+a = np.linspace(1, 5, 5)
+b = a
+\end{lstlisting}
+  Here, \texttt{b} is a \emph{view} (pointer) to the data of \texttt{a} ---
+  no copying of data!
+\begin{lstlisting}[style=pythonTiny]
+>>> a
+array([1., 2., 3., 4., 5.])
+>>> b[0] = 5                          # changes a[0] to 5
+>>> a
+array([5., 2., 3., 4., 5.])
+>>> a[1] = 9                          # changes b[1] to 9
+>>> b
+array([5., 9., 3., 4., 5.])
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Copying array data: the \texttt{copy} method}
+\begin{lstlisting}[style=pythonTiny]
+>>> c = a.copy()       # copy all elements to new array c
+>>> c[0] = 6           # a is not changed
+>>> a
+array([1., 2., 3., 4., 5.])
+>>> c
+array([6., 2., 3., 4., 5.])
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Construction of tridiagonal and sparse matrices}
+  \begin{itemize}
+    \item SciPy offers
+          \href{https://docs.scipy.org/doc/scipy/reference/sparse.html}{scipy.sparse}
+    \item Build sparse matrices from diagonals with \texttt{diags}
+          (or the newer \texttt{diags\_array})
+    \item Super-/sub-diagonals are shorter than the main diagonal
+    \item Scalar broadcasting is supported (specify \texttt{shape})
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Tridiagonal matrix with \texttt{diags}}
+\begin{lstlisting}[style=pythonTiny]
+>>> import numpy as np
+>>> import scipy.sparse
+>>> N = 6
+>>> diagonals = [
+...     -np.linspace(1, N, N)[:-1],
+...     -2*np.ones(N),
+...     np.linspace(1, N, N)[1:],
+... ]
+>>> A = scipy.sparse.diags(diagonals, [-1, 0, 1], format='csc')
+>>> A.toarray()
+[[-2.  2.  0.  0.  0.  0.]
+ [-1. -2.  3.  0.  0.  0.]
+ [ 0. -2. -2.  4.  0.  0.]
+ [ 0.  0. -3. -2.  5.  0.]
+ [ 0.  0.  0. -4. -2.  6.]
+ [ 0.  0.  0.  0. -5. -2.]]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Scalar broadcasting with \texttt{diags}}
+\begin{lstlisting}[style=pythonTiny]
+>>> B = scipy.sparse.diags(
+...     [1, 2, 3], [-2, 0, 1], shape=(6, 6), format='csc')
+>>> B.toarray()
+[[2. 3. 0. 0. 0. 0.]
+ [0. 2. 3. 0. 0. 0.]
+ [1. 0. 2. 3. 0. 0.]
+ [0. 1. 0. 2. 3. 0.]
+ [0. 0. 1. 0. 2. 3.]
+ [0. 0. 0. 1. 0. 2.]]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Legacy note: \texttt{spdiags}}
+  Older code may use \texttt{spdiags}: all diagonals must have length $N$;
+  unused entries sit at the start of super-diagonals and the end of
+  sub-diagonals.
+\begin{lstlisting}[style=pythonTiny]
+>>> diagonals = np.zeros((3, N))
+>>> diagonals[0, :] = np.linspace(-1, -N, N)
+>>> diagonals[1, :] = -2
+>>> diagonals[2, :] = np.linspace(1, N, N)
+>>> A = scipy.sparse.spdiags(
+...     diagonals, [-1, 0, 1], N, N, format='csc')
+\end{lstlisting}
+  Prefer \texttt{diags} / \texttt{diags\_array} in new code.
+\end{frame}
+
+\begin{frame}[fragile]{Solving a tridiagonal system}
+  Solve $Ax=b$: choose $x$, compute $b=Ax$, solve, check.
+\begin{lstlisting}[style=pythonTiny]
+>>> x = np.linspace(-1, 1, N)
+>>> b = A @ x                    # sparse matrix-vector product
+>>> import scipy.sparse.linalg
+>>> x = scipy.sparse.linalg.spsolve(A, b)
+>>> print(x)
+[-1.  -0.6 -0.2  0.2  0.6  1. ]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Check against dense matrix computations}
+\begin{lstlisting}[style=pythonTiny]
+>>> A_d = A.toarray()
+>>> b = A_d @ x                  # dense product
+>>> x = np.linalg.solve(A_d, b)
+>>> print(x)
+[-1.  -0.6 -0.2  0.2  0.6  1. ]
+\end{lstlisting}
+  See also \texttt{scipy\_intro/tridiagonal.py} in this repository.
+\end{frame}
+
+\begin{frame}[fragile]{Plotting}
+  Plotting is done with \texttt{matplotlib}:
+\lstinputlisting[style=pythonTiny,firstline=7]{code/plot1.py}
+\end{frame}
+
+\begin{frame}[fragile]{Plotting of multiple curves}
+  Core idea (see \texttt{python\_intro/plot2.py}):
+\begin{lstlisting}[style=pythonTiny]
+v0, a0, a1, n = 0.2, 2, 3, 21
+t = np.linspace(0, 2, n + 1)
+s0 = v0 * t + 0.5 * a0 * t**2
+s1 = v0 * t + 0.5 * a1 * t**2
+plt.plot(t, s0, 'r-', t, s1, 'bo')
+plt.xlabel('t [s]'); plt.ylabel('s [m]')
+plt.legend([rf'$s(t; v_0={v0}, a={a0})$',
+            rf'$s(t; v_0={v0}, a={a1})$'])
+\end{lstlisting}
+\end{frame}
