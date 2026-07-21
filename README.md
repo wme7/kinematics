@@ -10,9 +10,9 @@ The idea is simple: run a short simulation, watch the motion, then open the code
 
 A mass–spring–damper rides over a wavy road profile. The road height becomes a time-varying force, and the vertical motion \(u(t)\) follows
 
-\[
+$$
 m\,\ddot{u} + b\,\dot{u} + k\,u = F(t).
-\]
+$$
 
 ![Vehicle damper on a bumpy road](bumpy_road/bumpy_road.gif)
 
